@@ -1,547 +1,446 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Jukebox Together — YouTube Sync</title>
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS v2 -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        /* Scrollbar douce */
-        ::-webkit-scrollbar {
-            height: 8px;
-            width: 8px
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 6px
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jukebox Together — YouTube Sync</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS v2 -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    /* Scrollbar douce */
+    ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
+  </style>
 </head>
-
 <body class="bg-slate-50 text-slate-800">
-    <div class="max-w-5xl mx-auto p-6">
-        <header class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center font-bold">JM</div>
-                <div>
-                    <h1 class="text-2xl font-bold">Je t'aime Murielle ❤️</h1>
-                    <p class="text-sm text-slate-500">Ici c'est notre petit espace à nous deux pour écouter des chansons
-                        ensemble — de ton Mr Iandrianina 🎶</p>
+  <div class="max-w-5xl mx-auto p-6">
+    <header class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center font-bold">JM</div>
+            <div>
+                <h1 class="text-2xl font-bold">Je t'aime Murielle ❤️</h1>
+                <p class="text-sm text-slate-500">Ici c'est notre petit espace à nous deux pour écouter des chansons ensemble — de ton Mr Iandrianina 🎶</p>
+            </div>
+        </div>
+        <button id="copyLinkBtn"
+            class="px-3 py-2 rounded-xl text-sm bg-white border border-slate-200 shadow-sm hover:bg-slate-50">
+            Copier lien d’invitation
+        </button>
+    </header>
+
+    <main class="mt-6 grid md:grid-cols-5 gap-6">
+        <!-- Colonne gauche : Contrôles -->
+        <section class="md:col-span-2 space-y-4">
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="font-semibold mb-3">Notre salle</h2>
+                <div class="flex gap-2">
+                    <input id="roomInput"
+                        class="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                        placeholder="Code salle (ex: 472913)">
+                    <button id="genRoomBtn"
+                        class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:opacity-90">Générer</button>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    <button id="hostBtn"
+                        class="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:opacity-95">Je deviens DJ</button>
+                    <button id="joinBtn"
+                        class="px-3 py-2 rounded-xl bg-indigo-600 text-white hover:opacity-95">Je te rejoins</button>
+                </div>
+                <p id="status" class="mt-3 text-sm text-slate-500">Statut : en attente de toi ❤️</p>
+                <p id="presence" class="mt-1 text-sm text-slate-500">Connectés : —</p>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="font-semibold mb-3">Notre chanson</h2>
+                <div class="flex gap-2">
+                    <input id="ytInput"
+                        class="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                        placeholder="Lien YouTube ou ID (ex: dQw4w9WgXcQ)">
+                    <button id="loadBtn"
+                        class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:opacity-90">Charger</button>
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <button id="playBtn" class="px-3 py-2 rounded-xl bg-emerald-600 text-white">Lecture</button>
+                    <button id="pauseBtn" class="px-3 py-2 rounded-xl bg-rose-600 text-white">Pause</button>
+                    <button id="syncBtn" class="px-3 py-2 rounded-xl bg-indigo-600 text-white">Resynchroniser</button>
+                </div>
+                <p id="roleNote" class="mt-3 text-xs text-slate-500">Seul le DJ contrôle, l’autre écoute en synchro parfaite 💖</p>
+            </div>
+
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="font-semibold mb-3">Astuce pour nous</h2>
+                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                    <li>Partage le <b>code de salle</b> ou le lien d’invitation.</li>
+                    <li>Si la vidéo ne charge pas, c'est que YouTube bloque l'intégration.</li>
+                    <li>La synchronisation se fait automatiquement quand tu me rejoins.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Colonne droite : Player + log -->
+        <section class="md:col-span-3 space-y-4">
+            <div class="p-2 bg-white rounded-2xl shadow-sm border border-slate-200 aspect-video">
+                <div id="player"
+                    class="w-full h-full rounded-xl overflow-hidden bg-black grid place-items-center text-white">
+                    <span class="text-sm opacity-70">Le lecteur apparaîtra ici</span>
                 </div>
             </div>
-            <button id="copyLinkBtn"
-                class="px-3 py-2 rounded-xl text-sm bg-white border border-slate-200 shadow-sm hover:bg-slate-50">
-                Copier lien d’invitation
-            </button>
-        </header>
 
-        <main class="mt-6 grid md:grid-cols-5 gap-6">
-            <!-- Colonne gauche : Contrôles -->
-            <section class="md:col-span-2 space-y-4">
-                <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-semibold mb-3">Notre salle</h2>
-                    <div class="flex gap-2">
-                        <input id="roomInput"
-                            class="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
-                            placeholder="Code salle (ex: 472913)">
-                        <button id="genRoomBtn"
-                            class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:opacity-90">Générer</button>
-                    </div>
-                    <div class="mt-3 grid grid-cols-2 gap-2">
-                        <button id="hostBtn" class="px-3 py-2 rounded-xl bg-emerald-600 text-white hover:opacity-95">Je
-                            deviens DJ</button>
-                        <button id="joinBtn" class="px-3 py-2 rounded-xl bg-indigo-600 text-white hover:opacity-95">Je
-                            te rejoins</button>
-                    </div>
-                    <p id="status" class="mt-3 text-sm text-slate-500">Statut : en attente de toi ❤️</p>
-                    <p id="presence" class="mt-1 text-sm text-slate-500">Connectés : —</p>
+            <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="font-semibold mb-3">Notre petit journal</h2>
+                <div id="log"
+                    class="h-40 overflow-auto text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono">
                 </div>
+            </div>
+        </section>
+    </main>
+</div>
 
-                <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-semibold mb-3">Notre chanson</h2>
-                    <div class="flex gap-2">
-                        <input id="ytInput"
-                            class="flex-1 px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-300"
-                            placeholder="Lien YouTube ou ID (ex: dQw4w9WgXcQ)">
-                        <button id="loadBtn"
-                            class="px-3 py-2 rounded-xl bg-slate-900 text-white hover:opacity-90">Charger</button>
-                    </div>
-                    <div class="mt-3 flex gap-2">
-                        <button id="playBtn" class="px-3 py-2 rounded-xl bg-emerald-600 text-white">Lecture</button>
-                        <button id="pauseBtn" class="px-3 py-2 rounded-xl bg-rose-600 text-white">Pause</button>
-                        <button id="syncBtn"
-                            class="px-3 py-2 rounded-xl bg-indigo-600 text-white">Resynchroniser</button>
-                    </div>
-                    <p id="roleNote" class="mt-3 text-xs text-slate-500">Seul le DJ contrôle, l’autre écoute en synchro
-                        parfaite 💖</p>
-                </div>
 
-                <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-semibold mb-3">Astuce pour nous</h2>
-                    <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
-                        <li>Partage le <b>code de salle</b> ou le lien d’invitation.</li>
-                        <li>Si la vidéo ne charge pas, c'est que YouTube bloque l'intégration.</li>
-                        <li>La synchronisation se fait automatiquement quand tu me rejoins.</li>
-                    </ul>
-                </div>
-            </section>
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 
-            <!-- Colonne droite : Player + log -->
-            <section class="md:col-span-3 space-y-4">
-                <div class="p-2 bg-white rounded-2xl shadow-sm border border-slate-200 aspect-video">
-                    <div id="player"
-                        class="w-full h-full rounded-xl overflow-hidden bg-black grid place-items-center text-white">
-                        <span class="text-sm opacity-70">Le lecteur apparaîtra ici</span>
-                    </div>
-                </div>
+  <script>
+    /***********************
+     * 1) CONFIG SUPABASE *
+     ***********************/
+    const SUPABASE_URL = "https://wkvxwvehqnrwcgplmdxt.supabase.co";    // ← remplace
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indrdnh3dmVocW5yd2NncGxtZHh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzAzNzMsImV4cCI6MjA3MDYwNjM3M30.83tu-UV_xtOeJcVNzDuk4rJS2PiUAoXLEPClaHbRhxQ";                // ← remplace
 
-                <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="font-semibold mb-3">Notre petit journal</h2>
-                    <div id="log"
-                        class="h-40 overflow-auto text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono">
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+    if (SUPABASE_URL.includes("TON-") || SUPABASE_ANON_KEY.includes("TON-")) {
+      console.warn("⚠️ Remplace SUPABASE_URL et SUPABASE_ANON_KEY par tes vraies valeurs.");
+    }
 
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <script>
-        /***********************
-         * 1) CONFIG SUPABASE *
-         ***********************/
-        const SUPABASE_URL = "https://wkvxwvehqnrwcgplmdxt.supabase.co"; // ← remplace
-        const SUPABASE_ANON_KEY =
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indrdnh3dmVocW5yd2NncGxtZHh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwMzAzNzMsImV4cCI6MjA3MDYwNjM3M30.83tu-UV_xtOeJcVNzDuk4rJS2PiUAoXLEPClaHbRhxQ"; // ← remplace
+    /***********************
+     * 2) ETAT GLOBAL     *
+     ***********************/
+    const state = {
+      userId: "u_" + Math.random().toString(36).slice(2, 10),
+      role: "visitor",   // 'host' | 'listener' | 'visitor'
+      room: null,
+      channel: null,
+      player: null,
+      currentVideoId: null,
+      isReady: false,
+      lastRemoteUpdateAt: 0, // pour éviter boucles
+    };
 
-        if (SUPABASE_URL.includes("TON-") || SUPABASE_ANON_KEY.includes("TON-")) {
-            console.warn("⚠️ Remplace SUPABASE_URL et SUPABASE_ANON_KEY par tes vraies valeurs.");
+    const els = {
+      status: document.getElementById("status"),
+      presence: document.getElementById("presence"),
+      log: document.getElementById("log"),
+      roomInput: document.getElementById("roomInput"),
+      genRoomBtn: document.getElementById("genRoomBtn"),
+      hostBtn: document.getElementById("hostBtn"),
+      joinBtn: document.getElementById("joinBtn"),
+      copyLinkBtn: document.getElementById("copyLinkBtn"),
+      ytInput: document.getElementById("ytInput"),
+      loadBtn: document.getElementById("loadBtn"),
+      playBtn: document.getElementById("playBtn"),
+      pauseBtn: document.getElementById("pauseBtn"),
+      syncBtn: document.getElementById("syncBtn"),
+      roleNote: document.getElementById("roleNote"),
+    };
+
+    function log(msg) {
+      const t = new Date().toLocaleTimeString();
+      els.log.innerHTML += `[${t}] ${msg}<br/>`;
+      els.log.scrollTop = els.log.scrollHeight;
+    }
+
+    /***************************
+     * 3) YOUTUBE PLAYER READY *
+     ***************************/
+    window.onYouTubeIframeAPIReady = function() {
+      state.player = new YT.Player("player", {
+        height: "100%",
+        width: "100%",
+        playerVars: {
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          origin: location.origin
+        },
+        events: {
+          onReady: () => {
+            state.isReady = true;
+            log("YouTube prêt.");
+          },
+          onStateChange: (e) => onPlayerStateChange(e),
+          onError: (e) => {
+            log(`Erreur YouTube (${e.data}) — la vidéo peut bloquer l’intégration.`);
+            toast("Cette vidéo bloque peut-être l’intégration (101/150). Essaye un autre lien.");
+          }
         }
+      });
+    };
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    function onPlayerStateChange(e) {
+      if (state.role !== "host") return; // Seul le DJ broadcast
+      const player = state.player;
+      const current = player.getCurrentTime ? player.getCurrentTime() : 0;
 
-        /***********************
-         * 2) ETAT GLOBAL     *
-         ***********************/
-        const state = {
-            userId: "u_" + Math.random().toString(36).slice(2, 10),
-            role: "visitor", // 'host' | 'listener' | 'visitor'
-            room: null,
-            channel: null,
-            player: null,
-            currentVideoId: null,
-            isReady: false,
-            lastRemoteUpdateAt: 0, // pour éviter boucles
-        };
+      if (e.data === YT.PlayerState.PLAYING) {
+        broadcast({ type: "PLAY", at: current, rate: player.getPlaybackRate?.() || 1 });
+      } else if (e.data === YT.PlayerState.PAUSED) {
+        broadcast({ type: "PAUSE", at: current });
+      } else if (e.data === YT.PlayerState.BUFFERING) {
+        // Ignorer pour éviter le spam
+      }
+    }
 
-        const els = {
-            status: document.getElementById("status"),
-            presence: document.getElementById("presence"),
-            log: document.getElementById("log"),
-            roomInput: document.getElementById("roomInput"),
-            genRoomBtn: document.getElementById("genRoomBtn"),
-            hostBtn: document.getElementById("hostBtn"),
-            joinBtn: document.getElementById("joinBtn"),
-            copyLinkBtn: document.getElementById("copyLinkBtn"),
-            ytInput: document.getElementById("ytInput"),
-            loadBtn: document.getElementById("loadBtn"),
-            playBtn: document.getElementById("playBtn"),
-            pauseBtn: document.getElementById("pauseBtn"),
-            syncBtn: document.getElementById("syncBtn"),
-            roleNote: document.getElementById("roleNote"),
-        };
+    function applySnapshot({ videoId, at, playing, rate }) {
+      // Charge la vidéo si différente
+      if (state.currentVideoId !== videoId) {
+        state.currentVideoId = videoId;
+        state.player.loadVideoById({ videoId, startSeconds: at, suggestedQuality: "hd720" });
+      } else {
+        state.player.seekTo(at, true);
+        if (playing) state.player.playVideo();
+        else state.player.pauseVideo();
+      }
+      if (rate && state.player.setPlaybackRate) {
+        try { state.player.setPlaybackRate(rate); } catch {}
+      }
+    }
 
-        function log(msg) {
-            const t = new Date().toLocaleTimeString();
-            els.log.innerHTML += `[${t}] ${msg}<br/>`;
-            els.log.scrollTop = els.log.scrollHeight;
+    /*************************
+     * 4) OUTILS D’INVITATION
+     *************************/
+    function randomRoom() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function updateStatus(s) {
+      els.status.textContent = "Statut : " + s;
+    }
+
+    function toast(text) {
+      const id = "t_" + Math.random().toString(36).slice(2, 8);
+      const node = document.createElement("div");
+      node.id = id;
+      node.className = "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-lg";
+      node.textContent = text;
+      document.body.appendChild(node);
+      setTimeout(() => node.remove(), 3000);
+    }
+
+    els.genRoomBtn.addEventListener("click", () => {
+      els.roomInput.value = randomRoom();
+    });
+
+    els.copyLinkBtn.addEventListener("click", async () => {
+      if (!state.room) { toast("Rejoins une salle d’abord."); return; }
+      const url = `${location.origin}${location.pathname}#room=${state.room}&role=listener`;
+      await navigator.clipboard.writeText(url);
+      toast("Lien d’invitation copié !");
+    });
+
+    // Lecture hash auto (ex: #room=123456&role=listener)
+    (function parseHash() {
+      if (!location.hash) return;
+      const params = new URLSearchParams(location.hash.slice(1));
+      const room = params.get("room");
+      const role = params.get("role");
+      if (room) els.roomInput.value = room;
+      if (role === "listener") setTimeout(joinAsListener, 200);
+    })();
+
+    /************************
+     * 5) CONNEXION SALLE   *
+     ************************/
+    async function connectToRoom(role) {
+      const room = (els.roomInput.value || "").trim();
+      if (!room) { toast("Entre un code de salle."); return; }
+
+      // Si déjà connecté, quitte d'abord
+      if (state.channel) {
+        await state.channel.unsubscribe();
+      }
+
+      state.role = role;
+      state.room = room;
+
+      updateStatus(`connexion à #${room}…`);
+      log(`Connexion à la salle #${room} en tant que ${role}`);
+
+      // Crée un channel realtime
+      const channel = supabase.channel(`room:${room}`, {
+        config: {
+          broadcast: { self: false },
+          presence: { key: state.userId }
         }
+      });
 
-        /***************************
-         * 3) YOUTUBE PLAYER READY *
-         ***************************/
-        window.onYouTubeIframeAPIReady = function () {
-            state.player = new YT.Player("player", {
-                height: "100%",
-                width: "100%",
-                playerVars: {
-                    modestbranding: 1,
-                    playsinline: 1,
-                    rel: 0,
-                    origin: location.origin
-                },
-                events: {
-                    onReady: () => {
-                        state.isReady = true;
-                        log("YouTube prêt.");
-                    },
-                    onStateChange: (e) => onPlayerStateChange(e),
-                    onError: (e) => {
-                        log(`Erreur YouTube (${e.data}) — la vidéo peut bloquer l’intégration.`);
-                        toast(
-                            "Cette vidéo bloque peut-être l’intégration (101/150). Essaye un autre lien."
-                            );
-                    }
-                }
-            });
-        };
+      // Broadcast handler
+      channel.on("broadcast", { event: "control" }, ({ payload }) => {
+        if (!payload || payload.sender === state.userId) return;
+        state.lastRemoteUpdateAt = Date.now();
 
-        function onPlayerStateChange(e) {
-            if (state.role !== "host") return; // Seul le DJ broadcast
-            const player = state.player;
-            const current = player.getCurrentTime ? player.getCurrentTime() : 0;
-
-            if (e.data === YT.PlayerState.PLAYING) {
-                broadcast({
-                    type: "PLAY",
-                    at: current,
-                    rate: player.getPlaybackRate ? .() || 1
-                });
-            } else if (e.data === YT.PlayerState.PAUSED) {
-                broadcast({
-                    type: "PAUSE",
-                    at: current
-                });
-            } else if (e.data === YT.PlayerState.BUFFERING) {
-                // Ignorer pour éviter le spam
-            }
-        }
-
-        function applySnapshot({
-            videoId,
-            at,
-            playing,
-            rate
-        }) {
-            // Charge la vidéo si différente
-            if (state.currentVideoId !== videoId) {
-                state.currentVideoId = videoId;
-                state.player.loadVideoById({
-                    videoId,
-                    startSeconds: at,
-                    suggestedQuality: "hd720"
-                });
-            } else {
-                state.player.seekTo(at, true);
-                if (playing) state.player.playVideo();
-                else state.player.pauseVideo();
-            }
-            if (rate && state.player.setPlaybackRate) {
-                try {
-                    state.player.setPlaybackRate(rate);
-                } catch {}
-            }
-        }
-
-        /*************************
-         * 4) OUTILS D’INVITATION
-         *************************/
-        function randomRoom() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        function updateStatus(s) {
-            els.status.textContent = "Statut : " + s;
-        }
-
-        function toast(text) {
-            const id = "t_" + Math.random().toString(36).slice(2, 8);
-            const node = document.createElement("div");
-            node.id = id;
-            node.className =
-                "fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-lg";
-            node.textContent = text;
-            document.body.appendChild(node);
-            setTimeout(() => node.remove(), 3000);
-        }
-
-        els.genRoomBtn.addEventListener("click", () => {
-            els.roomInput.value = randomRoom();
-        });
-
-        els.copyLinkBtn.addEventListener("click", async () => {
-            if (!state.room) {
-                toast("Rejoins une salle d’abord.");
-                return;
-            }
-            const url = `${location.origin}${location.pathname}#room=${state.room}&role=listener`;
-            await navigator.clipboard.writeText(url);
-            toast("Lien d’invitation copié !");
-        });
-
-        // Lecture hash auto (ex: #room=123456&role=listener)
-        (function parseHash() {
-            if (!location.hash) return;
-            const params = new URLSearchParams(location.hash.slice(1));
-            const room = params.get("room");
-            const role = params.get("role");
-            if (room) els.roomInput.value = room;
-            if (role === "listener") setTimeout(joinAsListener, 200);
-        })();
-
-        /************************
-         * 5) CONNEXION SALLE   *
-         ************************/
-        async function connectToRoom(role) {
-            const room = (els.roomInput.value || "").trim();
-            if (!room) {
-                toast("Entre un code de salle.");
-                return;
-            }
-
-            // Si déjà connecté, quitte d'abord
-            if (state.channel) {
-                await state.channel.unsubscribe();
-            }
-
-            state.role = role;
-            state.room = room;
-
-            updateStatus(`connexion à #${room}…`);
-            log(`Connexion à la salle #${room} en tant que ${role}`);
-
-            // Crée un channel realtime
-            const channel = supabase.channel(`room:${room}`, {
-                config: {
-                    broadcast: {
-                        self: false
-                    },
-                    presence: {
-                        key: state.userId
-                    }
-                }
-            });
-
-            // Broadcast handler
-            channel.on("broadcast", {
-                event: "control"
-            }, ({
-                payload
-            }) => {
-                if (!payload || payload.sender === state.userId) return;
-                state.lastRemoteUpdateAt = Date.now();
-
-                switch (payload.type) {
-                    case "LOAD":
-                        state.currentVideoId = payload.videoId;
-                        log(`Remote: LOAD ${payload.videoId} @ ${payload.start}s`);
-                        if (state.role !== "host") {
-                            state.player.loadVideoById({
-                                videoId: payload.videoId,
-                                startSeconds: payload.start
-                            });
-                        }
-                        break;
-                    case "PLAY":
-                        if (state.role === "host") return;
-                        log(`Remote: PLAY @ ${payload.at.toFixed(2)}s`);
-                        safeSeek(payload.at);
-                        state.player.playVideo();
-                        break;
-                    case "PAUSE":
-                        if (state.role === "host") return;
-                        log(`Remote: PAUSE @ ${payload.at.toFixed(2)}s`);
-                        safeSeek(payload.at);
-                        state.player.pauseVideo();
-                        break;
-                    case "SEEK":
-                        if (state.role === "host") return;
-                        log(`Remote: SEEK @ ${payload.at.toFixed(2)}s`);
-                        safeSeek(payload.at);
-                        break;
-                    case "SYNC_REQUEST":
-                        if (state.role === "host" && state.player ? .getPlayerState) {
-                            const playing = state.player.getPlayerState() === YT.PlayerState.PLAYING;
-                            const at = state.player.getCurrentTime ? .() || 0;
-                            const rate = state.player.getPlaybackRate ? .() || 1;
-                            broadcast({
-                                type: "SYNC_SNAPSHOT",
-                                videoId: state.currentVideoId,
-                                at,
-                                playing,
-                                rate,
-                                t0: Date.now()
-                            });
-                            log("Répondu à SYNC_REQUEST");
-                        }
-                        break;
-                    case "SYNC_SNAPSHOT":
-                        if (state.role === "host") return;
-                        const drift = (Date.now() - payload.t0) / 1000;
-                        const target = (payload.at || 0) + drift;
-                        log(`SYNC_SNAPSHOT reçu (drift ~${drift.toFixed(2)}s)`);
-                        applySnapshot({
-                            videoId: payload.videoId,
-                            at: target,
-                            playing: payload.playing,
-                            rate: payload.rate
-                        });
-                        break;
-                }
-            });
-
-            // Presence handlers
-            channel.on("presence", {
-                event: "sync"
-            }, () => {
-                const statePresence = channel.presenceState();
-                const users = Object.values(statePresence).flat();
-                els.presence.textContent = "Connectés : " + users.length;
-                const hasHost = users.some(u => u.meta ? .role === "host");
-                if (role === "host" && hasHost && users.some(u => u.user_id !== state.userId && u.meta ?
-                        .role === "host")) {
-                    toast("Un DJ est déjà présent. Passe en auditeur.");
-                }
-            });
-
-            channel.subscribe(async (status) => {
-                if (status === "SUBSCRIBED") {
-                    state.channel = channel;
-                    updateStatus(`connecté à #${room} (${role})`);
-                    await channel.track({
-                        user_id: state.userId,
-                        meta: {
-                            role
-                        }
-                    });
-                    // L’auditeur demande un snapshot initial
-                    if (role === "listener") {
-                        broadcast({
-                            type: "SYNC_REQUEST"
-                        });
-                        log("SYNC_REQUEST envoyé");
-                    }
-                }
-            });
-        }
-
-        function broadcast(payload) {
-            if (!state.channel) return;
-            state.channel.send({
-                type: "broadcast",
-                event: "control",
-                payload: {
-                    ...payload,
-                    sender: state.userId
-                }
-            });
-        }
-
-        function safeSeek(t) {
-            const cur = state.player.getCurrentTime ? .() || 0;
-            if (Math.abs(cur - t) > 0.5) state.player.seekTo(t, true);
-        }
-
-        // Raccourcis UI
-        function joinAsHost() {
-            connectToRoom("host");
-        }
-
-        function joinAsListener() {
-            connectToRoom("listener");
-        }
-
-        els.hostBtn.addEventListener("click", joinAsHost);
-        els.joinBtn.addEventListener("click", joinAsListener);
-
-        /**********************
-         * 6) CONTROLES DJ    *
-         **********************/
-        function parseYouTubeId(input) {
-            input = (input || "").trim();
-            if (!input) return null;
-            // Si c’est déjà un ID probable
-            if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
-
-            try {
-                const url = new URL(input);
-                if (url.hostname.includes("youtu.be")) {
-                    return url.pathname.split("/")[1] || null;
-                }
-                if (url.searchParams.get("v")) {
-                    return url.searchParams.get("v");
-                }
-            } catch {
-                // pas une URL — on tente brut
-                if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
-            }
-            return null;
-        }
-
-        els.loadBtn.addEventListener("click", () => {
+        switch (payload.type) {
+          case "LOAD":
+            state.currentVideoId = payload.videoId;
+            log(`Remote: LOAD ${payload.videoId} @ ${payload.start}s`);
             if (state.role !== "host") {
-                toast("Seul le DJ peut charger une vidéo.");
-                return;
+              state.player.loadVideoById({ videoId: payload.videoId, startSeconds: payload.start });
             }
-            const id = parseYouTubeId(els.ytInput.value);
-            if (!id) {
-                toast("Lien/ID YouTube invalide.");
-                return;
-            }
-            state.currentVideoId = id;
-            state.player.loadVideoById({
-                videoId: id,
-                startSeconds: 0
-            });
-            broadcast({
-                type: "LOAD",
-                videoId: id,
-                start: 0
-            });
-            log("LOAD envoyé");
-        });
-
-        els.playBtn.addEventListener("click", () => {
-            if (state.role !== "host") {
-                toast("Seul le DJ peut lancer la lecture.");
-                return;
-            }
+            break;
+          case "PLAY":
+            if (state.role === "host") return;
+            log(`Remote: PLAY @ ${payload.at.toFixed(2)}s`);
+            safeSeek(payload.at);
             state.player.playVideo();
-            // onStateChange gère le broadcast PLAY
-        });
-
-        els.pauseBtn.addEventListener("click", () => {
-            if (state.role !== "host") {
-                toast("Seul le DJ peut mettre en pause.");
-                return;
-            }
+            break;
+          case "PAUSE":
+            if (state.role === "host") return;
+            log(`Remote: PAUSE @ ${payload.at.toFixed(2)}s`);
+            safeSeek(payload.at);
             state.player.pauseVideo();
-            // onStateChange gère le broadcast PAUSE
-        });
-
-        els.syncBtn.addEventListener("click", () => {
-            if (state.role === "host") {
-                const at = state.player.getCurrentTime ? .() || 0;
-                broadcast({
-                    type: "SEEK",
-                    at
-                });
-                log("SEEK forcé envoyé");
-            } else {
-                broadcast({
-                    type: "SYNC_REQUEST"
-                });
-                log("SYNC_REQUEST (auditeur) envoyé");
+            break;
+          case "SEEK":
+            if (state.role === "host") return;
+            log(`Remote: SEEK @ ${payload.at.toFixed(2)}s`);
+            safeSeek(payload.at);
+            break;
+          case "SYNC_REQUEST":
+            if (state.role === "host" && state.player?.getPlayerState) {
+              const playing = state.player.getPlayerState() === YT.PlayerState.PLAYING;
+              const at = state.player.getCurrentTime?.() || 0;
+              const rate = state.player.getPlaybackRate?.() || 1;
+              broadcast({
+                type: "SYNC_SNAPSHOT",
+                videoId: state.currentVideoId,
+                at,
+                playing,
+                rate,
+                t0: Date.now()
+              });
+              log("Répondu à SYNC_REQUEST");
             }
-        });
+            break;
+          case "SYNC_SNAPSHOT":
+            if (state.role === "host") return;
+            const drift = (Date.now() - payload.t0) / 1000;
+            const target = (payload.at || 0) + drift;
+            log(`SYNC_SNAPSHOT reçu (drift ~${drift.toFixed(2)}s)`);
+            applySnapshot({ videoId: payload.videoId, at: target, playing: payload.playing, rate: payload.rate });
+            break;
+        }
+      });
 
-        // Double-clic auditeur = demande de sync
-        document.getElementById("player").addEventListener("dblclick", () => {
-            if (state.role === "listener") {
-                broadcast({
-                    type: "SYNC_REQUEST"
-                });
-                toast("Sync demandée au DJ…");
-            }
-        });
-    </script>
+      // Presence handlers
+      channel.on("presence", { event: "sync" }, () => {
+        const statePresence = channel.presenceState();
+        const users = Object.values(statePresence).flat();
+        els.presence.textContent = "Connectés : " + users.length;
+        const hasHost = users.some(u => u.meta?.role === "host");
+        if (role === "host" && hasHost && users.some(u => u.user_id !== state.userId && u.meta?.role === "host")) {
+          toast("Un DJ est déjà présent. Passe en auditeur.");
+        }
+      });
+
+      channel.subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          state.channel = channel;
+          updateStatus(`connecté à #${room} (${role})`);
+          await channel.track({ user_id: state.userId, meta: { role } });
+          // L’auditeur demande un snapshot initial
+          if (role === "listener") {
+            broadcast({ type: "SYNC_REQUEST" });
+            log("SYNC_REQUEST envoyé");
+          }
+        }
+      });
+    }
+
+    function broadcast(payload) {
+      if (!state.channel) return;
+      state.channel.send({
+        type: "broadcast",
+        event: "control",
+        payload: { ...payload, sender: state.userId }
+      });
+    }
+
+    function safeSeek(t) {
+      const cur = state.player.getCurrentTime?.() || 0;
+      if (Math.abs(cur - t) > 0.5) state.player.seekTo(t, true);
+    }
+
+    // Raccourcis UI
+    function joinAsHost(){ connectToRoom("host"); }
+    function joinAsListener(){ connectToRoom("listener"); }
+
+    els.hostBtn.addEventListener("click", joinAsHost);
+    els.joinBtn.addEventListener("click", joinAsListener);
+
+    /**********************
+     * 6) CONTROLES DJ    *
+     **********************/
+    function parseYouTubeId(input) {
+      input = (input || "").trim();
+      if (!input) return null;
+      // Si c’est déjà un ID probable
+      if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+
+      try {
+        const url = new URL(input);
+        if (url.hostname.includes("youtu.be")) {
+          return url.pathname.split("/")[1] || null;
+        }
+        if (url.searchParams.get("v")) {
+          return url.searchParams.get("v");
+        }
+      } catch {
+        // pas une URL — on tente brut
+        if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+      }
+      return null;
+    }
+
+    els.loadBtn.addEventListener("click", () => {
+      if (state.role !== "host") { toast("Seul le DJ peut charger une vidéo."); return; }
+      const id = parseYouTubeId(els.ytInput.value);
+      if (!id) { toast("Lien/ID YouTube invalide."); return; }
+      state.currentVideoId = id;
+      state.player.loadVideoById({ videoId: id, startSeconds: 0 });
+      broadcast({ type: "LOAD", videoId: id, start: 0 });
+      log("LOAD envoyé");
+    });
+
+    els.playBtn.addEventListener("click", () => {
+      if (state.role !== "host") { toast("Seul le DJ peut lancer la lecture."); return; }
+      state.player.playVideo();
+      // onStateChange gère le broadcast PLAY
+    });
+
+    els.pauseBtn.addEventListener("click", () => {
+      if (state.role !== "host") { toast("Seul le DJ peut mettre en pause."); return; }
+      state.player.pauseVideo();
+      // onStateChange gère le broadcast PAUSE
+    });
+
+    els.syncBtn.addEventListener("click", () => {
+      if (state.role === "host") {
+        const at = state.player.getCurrentTime?.() || 0;
+        broadcast({ type: "SEEK", at });
+        log("SEEK forcé envoyé");
+      } else {
+        broadcast({ type: "SYNC_REQUEST" });
+        log("SYNC_REQUEST (auditeur) envoyé");
+      }
+    });
+
+    // Double-clic auditeur = demande de sync
+    document.getElementById("player").addEventListener("dblclick", () => {
+      if (state.role === "listener") {
+        broadcast({ type: "SYNC_REQUEST" });
+        toast("Sync demandée au DJ…");
+      }
+    });
+  </script>
 </body>
-
 </html>
