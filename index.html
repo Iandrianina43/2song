@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +27,7 @@
             position: fixed;
             width: 100%;
             height: 100%;
-            background-image:
+            background-image: 
                 radial-gradient(circle at 20% 50%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(255, 192, 203, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 20%, rgba(255, 228, 225, 0.3) 0%, transparent 50%);
@@ -66,14 +65,11 @@
         }
 
         @keyframes sparkle {
-
-            0%,
-            100% {
+            0%, 100% { 
                 transform: scale(1) rotate(0deg);
                 opacity: 1;
             }
-
-            50% {
+            50% { 
                 transform: scale(1.3) rotate(180deg);
                 opacity: 0.5;
             }
@@ -84,7 +80,6 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -100,19 +95,9 @@
         }
 
         @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-            }
-
-            25% {
-                transform: translateY(-10px) scale(1.05);
-            }
-
-            75% {
-                transform: translateY(-5px) scale(0.95);
-            }
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-10px) scale(1.05); }
+            75% { transform: translateY(-5px) scale(0.95); }
         }
 
         .name {
@@ -128,15 +113,8 @@
         }
 
         @keyframes shimmer {
-
-            0%,
-            100% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .message {
@@ -170,21 +148,10 @@
         }
 
         @keyframes slideHeartButton {
-            0% {
-                left: -30px;
-            }
-
-            50% {
-                left: calc(100% + 10px);
-            }
-
-            51% {
-                left: -30px;
-            }
-
-            100% {
-                left: -30px;
-            }
+            0% { left: -30px; }
+            50% { left: calc(100% + 10px); }
+            51% { left: -30px; }
+            100% { left: -30px; }
         }
 
         .heart-button:hover {
@@ -205,7 +172,6 @@
                 transform: translateY(0) rotate(0deg);
                 opacity: 1;
             }
-
             100% {
                 transform: translateY(-100vh) rotate(360deg);
                 opacity: 0;
@@ -221,23 +187,10 @@
         }
 
         @keyframes wiggle {
-
-            0%,
-            100% {
-                transform: rotate(-15deg) scale(1);
-            }
-
-            25% {
-                transform: rotate(15deg) scale(1.1);
-            }
-
-            50% {
-                transform: rotate(-10deg) scale(1.05);
-            }
-
-            75% {
-                transform: rotate(10deg) scale(1.1);
-            }
+            0%, 100% { transform: rotate(-15deg) scale(1); }
+            25% { transform: rotate(15deg) scale(1.1); }
+            50% { transform: rotate(-10deg) scale(1.05); }
+            75% { transform: rotate(10deg) scale(1.1); }
         }
 
         .popup-overlay {
@@ -259,13 +212,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .hidden-message {
@@ -300,15 +248,8 @@
         }
 
         @keyframes rotate {
-
-            0%,
-            100% {
-                transform: rotate(0deg) scale(1);
-            }
-
-            50% {
-                transform: rotate(180deg) scale(1.2);
-            }
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
         }
 
         .popup-overlay.show .hidden-message {
@@ -320,11 +261,9 @@
                 opacity: 0;
                 transform: scale(0.3) rotate(-10deg);
             }
-
             50% {
                 transform: scale(1.1) rotate(5deg);
             }
-
             100% {
                 opacity: 1;
                 transform: scale(1) rotate(0deg);
@@ -370,19 +309,127 @@
             }
         }
 
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                max-width: 90%;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .name {
+                font-size: 1.8em;
+            }
+
+            .emoji {
+                font-size: 3em;
+            }
+
+            .message {
+                font-size: 1.1em;
+            }
+
+            .heart-button {
+                padding: 15px 30px;
+                font-size: 1em;
+            }
+
+            .hidden-message {
+                padding: 30px 20px;
+                max-width: 85%;
+                font-size: 1em;
+            }
+
+            .hidden-message h2 {
+                font-size: 1.3em;
+            }
+
+            .hidden-message p {
+                font-size: 0.95em;
+            }
+
+            .hidden-message .text-line:last-child {
+                font-size: 1.2em !important;
+            }
+
+            .close-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.3em;
+            }
+
+            .container::before,
+            .container::after {
+                font-size: 1.5em;
+            }
+
+            .hidden-message::before,
+            .hidden-message::after {
+                font-size: 1.5em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+
+            .name {
+                font-size: 1.5em;
+            }
+
+            .emoji {
+                font-size: 2.5em;
+            }
+
+            .message {
+                font-size: 1em;
+            }
+
+            .heart-button {
+                padding: 12px 25px;
+                font-size: 0.9em;
+            }
+
+            .hidden-message {
+                padding: 25px 15px;
+                max-width: 90%;
+                font-size: 0.9em;
+            }
+
+            .hidden-message h2 {
+                font-size: 1.2em;
+            }
+
+            .hidden-message p {
+                font-size: 0.9em;
+            }
+
+            .hidden-message .text-line:last-child {
+                font-size: 1.1em !important;
+            }
+        }
+
         .show {
             display: block;
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <h1>💕 Pour toi 💕</h1>
         <div class="name">Murielle</div>
-
+        
         <div class="emoji">🥺</div>
-
+        
         <div class="message">
             <p>Je sais que ces derniers temps j'ai été un peu mad...</p>
             <p>Parfois je ne comprends même pas ce qui m'arrive.</p>
@@ -397,10 +444,10 @@
             <button class="close-btn" onclick="closePopup()">×</button>
             <h2 class="text-line" style="color: #ff6b9d; margin-bottom: 15px;">Je suis désolé mon bb 💝</h2>
             <p class="text-line">Tu es mon autre moi...</p>
-            <p class="text-line">Je t'aime de tout mon coeur</p>
-            <p class="text-line">Gli gli 🪶🪶</p>
+            <p class="text-line">Ma moitié, celle qui me complète.</p>
+            <p class="text-line">Sans toi, je ne suis pas entier.</p>
             <p class="text-line" style="font-size: 1.5em; margin-top: 20px; color: #667eea;">
-                <strong>Je t'aime tellement ma vie❤️</strong>
+                <strong>Je t'aime tellement ❤️</strong>
             </p>
         </div>
     </div>
@@ -409,7 +456,7 @@
         function showLove() {
             const popup = document.getElementById('popupOverlay');
             popup.classList.add('show');
-
+            
             // Animate each text line with delay
             const lines = document.querySelectorAll('.text-line');
             lines.forEach((line, index) => {
@@ -417,9 +464,9 @@
                     line.classList.add('animate');
                 }, index * 300);
             });
-
+            
             createHearts();
-
+            
             // Change button text
             const btn = document.querySelector('.heart-button');
             btn.textContent = 'Encore des cœurs ! 💖';
@@ -428,24 +475,23 @@
         function closePopup() {
             const popup = document.getElementById('popupOverlay');
             popup.classList.remove('show');
-
+            
             // Reset text lines
             const lines = document.querySelectorAll('.text-line');
             lines.forEach(line => line.classList.remove('animate'));
         }
 
         function createHearts() {
-            for (let i = 0; i < 30; i++) {
+            for(let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
                     heart.classList.add('heart');
-                    heart.textContent = ['❤️', '💕', '💖', '💗', '💝', '💓', '💞', '🌸', '✨'][Math.floor(Math
-                        .random() * 9)];
+                    heart.textContent = ['❤️', '💕', '💖', '💗', '💝', '💓', '💞', '🌸', '✨'][Math.floor(Math.random() * 9)];
                     heart.style.left = Math.random() * 100 + 'vw';
                     heart.style.animationDelay = Math.random() * 2 + 's';
                     heart.style.fontSize = (Math.random() * 40 + 25) + 'px';
                     document.body.appendChild(heart);
-
+                    
                     setTimeout(() => heart.remove(), 4000);
                 }, i * 80);
             }
@@ -464,5 +510,4 @@
         }, 2000);
     </script>
 </body>
-
 </html>
